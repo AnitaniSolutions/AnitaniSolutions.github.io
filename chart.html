@@ -1,73 +1,47 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8">
-    <title>Random Walk Chart</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  </head>
-  <body>
-    <canvas id="myChart"></canvas>
-    <script>
-      // Set up the chart
-      var ctx = document.getElementById('myChart').getContext('2d');
-      var chart = new Chart(ctx, {
+const chart = Highcharts.chart('container', {
+    chart: {
         type: 'candlestick',
-        data: {
-          datasets: [{
-            label: 'Price',
-            data: []
-          }]
-        },
-        options: {
-          responsive: true,
-          scales: {
-            xAxes: [{
-              type: 'time',
-              time: {
-                unit: 'second',
-                displayFormats: {
-                  second: 'h:mm:ss a'
-                }
-              }
-            }],
-            yAxes: [{
-              ticks: {
-                beginAtZero: false
-              }
-            }]
-          }
+        zoomType: 'x',
+        events: {
+            // Update the chart data every 10 seconds
+            load: function () {
+                const series = this.series[0];
+                setInterval(function () {
+                    const data = generateData();
+                    series.addPoint(data, true, true);
+                }, 10000);
+            }
         }
-      });
-
-      // Generate random walk prices
-      var currentPrice = 100;
-      var lastUpdate = Date.now();
-      var priceData = [];
-
-      function updatePrices() {
-        var now = Date.now();
-        var elapsedTime = (now - lastUpdate) / 1000; // in seconds
-        lastUpdate = now;
-        var drift = (Math.random() - 0.5) * 2; // random drift between -1 and 1
-        var volatility = 0.05; // constant volatility
-        var priceChange = currentPrice * drift * volatility * elapsedTime;
-        currentPrice += priceChange;
-        var time = new Date(now);
-        priceData.push({
-          t: time,
-          o: currentPrice,
-          h: currentPrice + Math.random() * 5,
-          l: currentPrice - Math.random() * 5,
-          c: currentPrice
-        });
-        if (priceData.length > 10) {
-          priceData.shift();
+    },
+    title: {
+        text: 'Random Walk Price Chart'
+    },
+    xAxis: {
+        type: 'datetime'
+    },
+    yAxis: {
+        title: {
+            text: 'Price'
         }
-        chart.data.datasets[0].data = priceData;
-        chart.update();
-      }
+    },
+    series: [{
+        name: 'Price',
+        data: []
+    }]
+});
 
-      setInterval(updatePrices, 10000);
-    </script>
-  </body>
-</html>
+function generateData() {
+    const lastDataPoint = chart.series[0].data[chart.series[0].data.length - 1];
+    const lastTime = lastDataPoint ? lastDataPoint.x : Date.now();
+
+    // Generate a new price based on a random walk
+    const price = lastDataPoint ? lastDataPoint.close + (Math.random() - 0.5) * 2 : 100;
+    const data = {
+        x: lastTime + 10000, // add 10 seconds to the last time to create a new data point
+        open: price,
+        high: price + Math.random() * 10,
+        low: price - Math.random() * 10,
+        close: price + (Math.random() - 0.5) * 20 // add some randomness to the close price
+    };
+    return data;
+}
