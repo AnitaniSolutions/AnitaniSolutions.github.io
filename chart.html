@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Random Walk Chart</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body>
+    <canvas id="myChart"></canvas>
+    <script>
+      // Set up the chart
+      var ctx = document.getElementById('myChart').getContext('2d');
+      var chart = new Chart(ctx, {
+        type: 'candlestick',
+        data: {
+          datasets: [{
+            label: 'Price',
+            data: []
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            xAxes: [{
+              type: 'time',
+              time: {
+                unit: 'second',
+                displayFormats: {
+                  second: 'h:mm:ss a'
+                }
+              }
+            }],
+            yAxes: [{
+              ticks: {
+                beginAtZero: false
+              }
+            }]
+          }
+        }
+      });
+
+      // Generate random walk prices
+      var currentPrice = 100;
+      var lastUpdate = Date.now();
+      var priceData = [];
+
+      function updatePrices() {
+        var now = Date.now();
+        var elapsedTime = (now - lastUpdate) / 1000; // in seconds
+        lastUpdate = now;
+        var drift = (Math.random() - 0.5) * 2; // random drift between -1 and 1
+        var volatility = 0.05; // constant volatility
+        var priceChange = currentPrice * drift * volatility * elapsedTime;
+        currentPrice += priceChange;
+        var time = new Date(now);
+        priceData.push({
+          t: time,
+          o: currentPrice,
+          h: currentPrice + Math.random() * 5,
+          l: currentPrice - Math.random() * 5,
+          c: currentPrice
+        });
+        if (priceData.length > 10) {
+          priceData.shift();
+        }
+        chart.data.datasets[0].data = priceData;
+        chart.update();
+      }
+
+      setInterval(updatePrices, 10000);
+    </script>
+  </body>
+</html>
