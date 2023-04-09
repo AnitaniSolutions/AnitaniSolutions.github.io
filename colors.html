@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Centered Frame with Pastel Green Background</title>
+    <title>Random Color Pixels with Fading Effect</title>
     <style>
       body {
         background-color: #d4f4dd;
@@ -15,47 +15,89 @@
         width: 80%;
         height: 50%;
         background-color: white;
-        display: grid;
-        grid-template-columns: repeat(16, 1fr);
-        grid-template-rows: repeat(16, 1fr);
-        gap: 1px;
+        position: relative;
       }
 
       .pixel {
-        background-color: #fff;
-        transition: opacity 0.5s ease-out;
-      }
-
-      .pixel.active {
-        opacity: 0;
-        transition: opacity 2s ease-out;
+        width: 10px;
+        height: 10px;
+        position: absolute;
       }
     </style>
   </head>
   <body>
     <div class="frame">
       <!-- Content goes here -->
-      <!-- Generate 256 pixels for the grid -->
-      <script>
-        for (let i = 0; i < 256; i++) {
-          const pixel = document.createElement('div');
-          pixel.classList.add('pixel');
-          pixel.addEventListener('mouseover', changeColor);
-          pixel.addEventListener('touchstart', changeColor);
-          document.querySelector('.frame').appendChild(pixel);
-        }
-
-        function changeColor(event) {
-          const randomColor = Math.floor(Math.random() * 16777215).toString(16);
-          const randomDuration = Math.floor(Math.random() * 4750) + 250;
-          const pixel = event.target;
-          pixel.style.backgroundColor = '#' + randomColor;
-          pixel.classList.add('active');
-          setTimeout(() => {
-            pixel.classList.remove('active');
-          }, randomDuration);
-        }
-      </script>
     </div>
+
+    <div>
+      <label for="duration-slider">Duration:</label>
+      <input type="range" id="duration-slider" min="0.25" max="5" step="0.25" value="1">
+      <span id="duration-value">1</span> seconds
+    </div>
+
+    <div>
+      <label for="frequency-slider">Frequency:</label>
+      <input type="range" id="frequency-slider" min="1" max="100" value="10">
+      <span id="frequency-value">10</span> pixels per second
+    </div>
+
+    <script>
+      const frame = document.querySelector('.frame');
+      const durationSlider = document.querySelector('#duration-slider');
+      const durationValue = document.querySelector('#duration-value');
+      const frequencySlider = document.querySelector('#frequency-slider');
+      const frequencyValue = document.querySelector('#frequency-value');
+
+      let pixels = [];
+
+      function createPixel() {
+        const pixel = document.createElement('div');
+        pixel.classList.add('pixel');
+        pixel.style.top = Math.floor(Math.random() * 100) + '%';
+        pixel.style.left = Math.floor(Math.random() * 100) + '%';
+        frame.appendChild(pixel);
+        pixels.push(pixel);
+
+        const duration = parseFloat(durationSlider.value) * 1000;
+        const fadeTime = 500;
+        const interval = setInterval(() => {
+          const r = Math.floor(Math.random() * 256);
+          const g = Math.floor(Math.random() * 256);
+          const b = Math.floor(Math.random() * 256);
+          pixel.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+          setTimeout(() => {
+            pixel.style.opacity = '0';
+            setTimeout(() => {
+              frame.removeChild(pixel);
+              pixels = pixels.filter(p => p !== pixel);
+            }, fadeTime);
+          }, duration);
+        }, duration / frequencySlider.value * 1000);
+
+        pixel.addEventListener('mouseover', () => {
+          clearInterval(interval);
+          pixel.style.opacity = '0';
+          setTimeout(() => {
+            frame.removeChild(pixel);
+            pixels = pixels.filter(p => p !== pixel);
+          }, fadeTime);
+        });
+      }
+
+      durationSlider.addEventListener('input', () => {
+        durationValue.textContent = durationSlider.value;
+      });
+
+      frequencySlider.addEventListener('input', () => {
+        frequencyValue.textContent = frequencySlider.value;
+      });
+
+      setInterval(() => {
+        for (let i = 0; i < frequencySlider.value; i++) {
+          createPixel();
+        }
+      }, 1000 / frequencySlider.value);
+    </script>
   </body>
 </html>
