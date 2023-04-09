@@ -15,12 +15,47 @@
         width: 80%;
         height: 50%;
         background-color: white;
+        display: grid;
+        grid-template-columns: repeat(16, 1fr);
+        grid-template-rows: repeat(16, 1fr);
+        gap: 1px;
+      }
+
+      .pixel {
+        background-color: #fff;
+        transition: opacity 0.5s ease-out;
+      }
+
+      .pixel.active {
+        opacity: 0;
+        transition: opacity 2s ease-out;
       }
     </style>
   </head>
   <body>
     <div class="frame">
       <!-- Content goes here -->
+      <!-- Generate 256 pixels for the grid -->
+      <script>
+        for (let i = 0; i < 256; i++) {
+          const pixel = document.createElement('div');
+          pixel.classList.add('pixel');
+          pixel.addEventListener('mouseover', changeColor);
+          pixel.addEventListener('touchstart', changeColor);
+          document.querySelector('.frame').appendChild(pixel);
+        }
+
+        function changeColor(event) {
+          const randomColor = Math.floor(Math.random() * 16777215).toString(16);
+          const randomDuration = Math.floor(Math.random() * 4750) + 250;
+          const pixel = event.target;
+          pixel.style.backgroundColor = '#' + randomColor;
+          pixel.classList.add('active');
+          setTimeout(() => {
+            pixel.classList.remove('active');
+          }, randomDuration);
+        }
+      </script>
     </div>
   </body>
 </html>
