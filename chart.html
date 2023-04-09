@@ -1,47 +1,98 @@
-const chart = Highcharts.chart('container', {
-    chart: {
-        type: 'candlestick',
-        zoomType: 'x',
-        events: {
-            // Update the chart data every 10 seconds
-            load: function () {
-                const series = this.series[0];
-                setInterval(function () {
-                    const data = generateData();
-                    series.addPoint(data, true, true);
-                }, 10000);
-            }
-        }
-    },
-    title: {
-        text: 'Random Walk Price Chart'
-    },
-    xAxis: {
-        type: 'datetime'
-    },
-    yAxis: {
-        title: {
-            text: 'Price'
-        }
-    },
-    series: [{
-        name: 'Price',
-        data: []
-    }]
-});
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Random Walk Chart</title>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+  <div id="plot"></div>
 
-function generateData() {
-    const lastDataPoint = chart.series[0].data[chart.series[0].data.length - 1];
-    const lastTime = lastDataPoint ? lastDataPoint.x : Date.now();
+  <script>
+    var nPoints = 1000;
+    var interval = 10 * 1000; // 10 seconds
+    var prices = Array(nPoints).fill(100);
+    var timestamps = Array(nPoints).fill(Date.now());
 
-    // Generate a new price based on a random walk
-    const price = lastDataPoint ? lastDataPoint.close + (Math.random() - 0.5) * 2 : 100;
-    const data = {
-        x: lastTime + 10000, // add 10 seconds to the last time to create a new data point
-        open: price,
-        high: price + Math.random() * 10,
-        low: price - Math.random() * 10,
-        close: price + (Math.random() - 0.5) * 20 // add some randomness to the close price
+    // Define the chart layout
+    var layout = {
+      title: 'Random Walk Chart',
+      xaxis: {
+        title: 'Time',
+        type: 'date',
+        tickformat: '%H:%M:%S'
+      },
+      yaxis: {
+        title: 'Price',
+        autorange: true,
+        type: 'linear'
+      },
+      showlegend: false
     };
-    return data;
-}
+
+    // Define the initial chart data
+    var trace = {
+      x: [timestamps[0]],
+      y: [prices[0]],
+      type: 'scatter',
+      mode: 'lines',
+      line: {
+        color: 'blue',
+        width: 1
+      }
+    };
+    var data = [trace];
+
+    // Create the chart
+    Plotly.newPlot('plot', data, layout);
+
+    // Update the chart data and layout every interval
+    setInterval(function() {
+      var lastPrice = prices[prices.length - 1];
+      var newPrice = lastPrice + (Math.random() - 0.5) * 10;
+      prices.shift();
+      prices.push(newPrice);
+
+      var lastTimestamp = timestamps[timestamps.length - 1];
+      var newTimestamp = lastTimestamp + interval;
+      timestamps.shift();
+      timestamps.push(newTimestamp);
+
+      var x = [];
+      var y = [];
+      var open = [];
+      var high = -Infinity;
+      var low = Infinity;
+      var close = newPrice;
+      for (var i = 0; i < nPoints; i++) {
+        if (timestamps[i] > newTimestamp - interval) {
+          x.push(timestamps[i]);
+          y.push(prices[i]);
+          high = Math.max(high, prices[i]);
+          low = Math.min(low, prices[i]);
+        }
+      }
+      open.push(prices[nPoints - interval / 1000]);
+      open.push(prices[nPoints - 1]);
+      x.push(newTimestamp);
+      y.push(newPrice);
+
+      var trace = {
+        x: x,
+        y: y,
+        type: 'candlestick',
+        increasing: {line: {color: 'green'}},
+        decreasing: {line: {color: 'red'}},
+        line: {color: 'blue'},
+        whiskerwidth: 0,
+        hoverinfo: 'none',
+        open: open,
+        high: [high, high],
+        low: [low, low],
+        close: [close, close]
+      };
+      Plotly.update('plot', [trace], layout);
+    }, interval);
+  </script>
+</body>
+</html>
