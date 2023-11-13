@@ -1079,3 +1079,9 @@ input, select, textarea {
 		#header nav {
 			padding: 0 1em;
 		} }
+
+		.gradient-text {
+			background-image: linear-gradient(45deg, #ff00a9, #00fff5);
+			-webkit-background-clip: text;
+			color: transparent;
+		}
