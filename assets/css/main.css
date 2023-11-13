@@ -1080,10 +1080,11 @@ input, select, textarea {
 			padding: 0 1em;
 		} }
 
-		.gradient-text {
+		..gradient-text {
 			background-image: linear-gradient(45deg, #ff0000, #ffff00, #00ff00);
 			-webkit-background-clip: text;
-			color: transparent;
-			font-weight: bold; /* Add this line */
+			color: rgba(255, 255, 255, 0.8); /* Adjust the alpha value (0.8 for less transparency) */
+			font-weight: bold;
 		}
+		
 		
