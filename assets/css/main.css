@@ -1114,4 +1114,17 @@ input, select, textarea {
 			letter-spacing: 8px; /* You can adjust this value for more or less spacing */
 			color: black;
 		}
+		nav {
+			text-align: center;
+		  }
+		nav ul {
+		padding: 0;
+		list-style: none;
+		display: inline-block;
+		}
+		nav ul li {
+		display: inline-block;
+		margin-right: 10px; /* Adjust this as needed */
+		}
+		  
 		
