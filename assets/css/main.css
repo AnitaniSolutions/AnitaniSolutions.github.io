@@ -1087,7 +1087,7 @@ input, select, textarea {
 			font-weight: bold;
 		}
 		.slogan-text {
-			letter-spacing: 2px; /* You can adjust this value for more or less spacing */
+			letter-spacing: 8px; /* You can adjust this value for more or less spacing */
 			color: black;
 		}
 				
