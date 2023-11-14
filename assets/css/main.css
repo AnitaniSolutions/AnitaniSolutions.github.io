@@ -1086,5 +1086,21 @@ input, select, textarea {
 			color: rgba(255, 255, 255, 0.8); /* Adjust the alpha value (0.8 for less transparency) */
 			font-weight: bold;
 		}
+		.slogan-text {
+			letter-spacing: 2px; /* You can adjust this value for more or less spacing */
+			color: black;
+		}
+				
+		.logo {
+			width: 80px; /* Adjust size as needed */
+			height: 80px; /* Adjust size as needed */
+			border-radius: 50%; /* Makes it circular */
+			overflow: hidden; /* Ensures the image stays within the circle */
+		}
 		
+		.logo img {
+			width: 100%; /* Fills the circle with the image */
+			height: 100%; /* Fills the circle with the image */
+			object-fit: cover; /* Maintain aspect ratio and cover the circle */
+		}
 		
